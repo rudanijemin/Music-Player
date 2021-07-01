@@ -15,12 +15,15 @@ void main() {
  }
 
  class MusicApp extends StatefulWidget {
-
    @override
    _MusicAppState createState() => _MusicAppState();
  }
-
  class _MusicAppState extends State<MusicApp> {
+
+  //we will need some variables
+   bool playing = false; // at the begining we are not playing any song
+   IconData playBtn = Icons.play_arrow; //the main state of the play button icon
+
    @override
    Widget build(BuildContext context) {
      return Scaffold(
@@ -105,9 +108,24 @@ void main() {
                          IconButton(
                            iconSize:70,
                            color: Colors.blueAccent ,
-                           onPressed:  (){},
+                           onPressed:  (){
+                             //here we will add the functionlity of the play button
+                             if(!playing){
+                               setState(() {
+                                 playBtn=Icons.pause;
+                                 playing=true;
+                               });
+                             }
+                             else{
+                               setState(() {
+                                 playBtn=Icons.play_arrow;
+                                 playing=false;
+                               });
+                             }
+
+                           },
                            icon: Icon(
-                             Icons.play_arrow,
+                             playBtn,
                            ),
                          ),
                          IconButton(
