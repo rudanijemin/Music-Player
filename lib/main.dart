@@ -85,11 +85,43 @@ void main() {
                    ),
 
                  ),
-                 SizedBox(height: 30),
+                 SizedBox(height: 20),
                  Expanded(child:Column(
                    mainAxisAlignment: MainAxisAlignment.center,
                    crossAxisAlignment: CrossAxisAlignment.center,
-                   
+                   children: [
+                     Row(
+                       mainAxisAlignment: MainAxisAlignment.center,
+                       crossAxisAlignment: CrossAxisAlignment.center,
+                       children: [
+                         IconButton(
+                           iconSize:45,
+                           color: Colors.blue ,
+                           onPressed:  (){},
+                           icon: Icon(
+                             Icons.skip_previous,
+                           ),
+                         ),
+                         IconButton(
+                           iconSize:70,
+                           color: Colors.blueAccent ,
+                           onPressed:  (){},
+                           icon: Icon(
+                             Icons.play_arrow,
+                           ),
+                         ),
+                         IconButton(
+                           iconSize:45,
+                           color: Colors.blue ,
+                           onPressed:  (){},
+                           icon: Icon(
+                             Icons.skip_next,
+                           ),
+                         ),
+                       ],
+
+                     ),
+                   ],
 
                  ) ),
                ],
