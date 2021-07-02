@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:flutter/material.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -22,7 +26,37 @@ void main() {
 
   //we will need some variables
    bool playing = false; // at the begining we are not playing any song
-   IconData playBtn = Icons.play_arrow; //the main state of the play button icon
+   IconData playBtn = Icons.play_arrow;//the main state of the play button icon
+
+   //Now let's start by creating our music player
+   //first let's declare some object
+   AudioPlayer _player;
+   AudioCache cache;
+
+   Duration position = new Duration();
+   Duration musicLength = new Duration();
+
+   //we will create a custom slider
+
+   Widget slider() {
+     return Container(
+       width: 300.0,
+       child: Slider.adaptive(
+           activeColor: Colors.blue[800],
+           inactiveColor: Colors.grey[350],
+           value: position.inSeconds.toDouble(),
+           max: musicLength.inSeconds.toDouble(),
+           onChanged: (value) {
+             seekToSec(value.toInt());
+           }),
+     );
+   }
+
+   //let's create the seek function that will allow us to go to a certain position of the music
+   void seekToSec(int sec) {
+     Duration newPos = Duration(seconds: sec);
+     _player.seek(newPos);
+   }
 
    @override
    Widget build(BuildContext context) {
@@ -93,6 +127,7 @@ void main() {
                    mainAxisAlignment: MainAxisAlignment.center,
                    crossAxisAlignment: CrossAxisAlignment.center,
                    children: [
+                     slider(),
                      Row(
                        mainAxisAlignment: MainAxisAlignment.center,
                        crossAxisAlignment: CrossAxisAlignment.center,
