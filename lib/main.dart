@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:audioplayers/audio_cache.dart';
-import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 
 void main() {
@@ -25,12 +25,12 @@ void main() {
  class _MusicAppState extends State<MusicApp> {
 
   //we will need some variables
-   bool playing = false; // at the begining we are not playing any song
+   bool isPlaying = false; // at the begining we are not playing any song
    IconData playBtn = Icons.play_arrow;//the main state of the play button icon
 
    //Now let's start by creating our music player
    //first let's declare some object
-   AudioPlayer _player;
+   AudioPlayer _audioPlayer;
    AudioCache cache;
 
    Duration position = new Duration();
@@ -40,7 +40,7 @@ void main() {
 
    Widget slider() {
      return Container(
-       width: 300.0,
+       width: 200.0,
        child: Slider.adaptive(
            activeColor: Colors.blue[800],
            inactiveColor: Colors.grey[350],
@@ -55,7 +55,34 @@ void main() {
    //let's create the seek function that will allow us to go to a certain position of the music
    void seekToSec(int sec) {
      Duration newPos = Duration(seconds: sec);
-     _player.seek(newPos);
+     _audioPlayer.seek(newPos);
+   }
+
+
+   //Now let's initialize our player
+   @override
+   void initState() {
+     // TODO: implement initState
+     super.initState();
+     _audioPlayer = AudioPlayer();
+     cache = AudioCache(fixedPlayer: _audioPlayer);
+
+
+     //now let's handle the audioplayer time
+
+     //this function will allow you to get the music duration
+     _audioPlayer.durationHandler = (d) {
+       setState(() {
+         musicLength = d;
+       });
+     };
+
+     //this function will allow us to move the cursor of the slider while we are playing the song
+     _audioPlayer.positionHandler = (p) {
+       setState(() {
+         position = p;
+       });
+     };
    }
 
    @override
@@ -74,7 +101,7 @@ void main() {
            ),
          ),
          child: Padding(
-           padding: EdgeInsets.symmetric(vertical: 60,horizontal: 20),
+           padding: EdgeInsets.symmetric(vertical: 80,horizontal: 20),
            child: Container(
              child: Column(
                mainAxisAlignment: MainAxisAlignment.start,
@@ -97,37 +124,60 @@ void main() {
                  SizedBox(
                    height: 25,
                  ),
-
-                 Center(
-                   child: Container(
-                     width: 250,
-                     height: 200,
-                     decoration: BoxDecoration(
-                       borderRadius: BorderRadius.circular(60),
-                       image: DecorationImage(
-                         image: AssetImage("images/music.jpg"),
-                       ),
+                 Container(
+                   margin: EdgeInsets.only(top: 50),
+                   child: FlatButton(
+                     onPressed: () async {
+                       _audioPlayer.pause();
+                       String filePath = await FilePicker.getFilePath();
+                       int status = await _audioPlayer.play(filePath, isLocal: true);
+                       if (status == 1) {
+                         setState(() {
+                           isPlaying = true;
+                         });
+                       }
+                     },
+                     child: Image.asset(
+                       "images/2.jpg",
+                       fit: BoxFit.contain,
                      ),
                    ),
                  ),
-                 SizedBox(
-                   height: 18,
-                 ),
-                 Center(
-                   child: Text("Stargazer",
-                     style: TextStyle(
-                       color: Colors.blueGrey,
-                       fontSize: 25,
-                     ),
-                   ),
 
-                 ),
+
                  SizedBox(height: 20),
                  Expanded(child:Column(
                    mainAxisAlignment: MainAxisAlignment.center,
                    crossAxisAlignment: CrossAxisAlignment.center,
                    children: [
-                     slider(),
+                     //Let's start by adding the controller
+                     //let's add the time indicator text
+                     Container(
+                       width:500.0,
+                       child: Row(
+                         mainAxisAlignment: MainAxisAlignment.center ,
+                         crossAxisAlignment: CrossAxisAlignment.center,
+                         children: [
+                           Text(
+                             "${position.inMinutes}:${position.inSeconds.remainder(60)}",
+                             style: TextStyle(
+                               fontSize: 15.0,
+                               color: Colors.blueAccent,
+                             ),
+                           ),
+                           slider(),
+                           Text(
+                             "${musicLength.inMinutes}:${musicLength.inSeconds.remainder(60)}",
+                             style: TextStyle(
+                               fontSize: 15.0,
+                               color: Colors.blueAccent,
+                             ),
+                           ),
+                         ],
+                       ),
+                     ),
+
+
                      Row(
                        mainAxisAlignment: MainAxisAlignment.center,
                        crossAxisAlignment: CrossAxisAlignment.center,
@@ -141,28 +191,31 @@ void main() {
                            ),
                          ),
                          IconButton(
-                           iconSize:70,
-                           color: Colors.blueAccent ,
-                           onPressed:  (){
-                             //here we will add the functionlity of the play button
-                             if(!playing){
-                               setState(() {
-                                 playBtn=Icons.pause;
-                                 playing=true;
-                               });
-                             }
-                             else{
-                               setState(() {
-                                 playBtn=Icons.play_arrow;
-                                 playing=false;
-                               });
-                             }
-
-                           },
+                           iconSize: 60,
                            icon: Icon(
-                             playBtn,
+                             isPlaying ? Icons.pause : Icons.play_arrow,
+
+
+                             color: Colors.blueAccent,
                            ),
+                           onPressed: () {
+                             if (isPlaying) {
+                               _audioPlayer.pause();
+                               cache.play("filePath, isLocal: true");
+                               setState(() {
+                                 isPlaying = false;
+                               });
+                             } else {
+                               _audioPlayer.resume();
+                               setState(() {
+                                 isPlaying = true;
+                               });
+                             }
+                           },
                          ),
+
+
+
                          IconButton(
                            iconSize:45,
                            color: Colors.blue ,
@@ -188,4 +241,3 @@ void main() {
    }
  }
 
- 
